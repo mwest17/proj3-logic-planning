@@ -12,7 +12,7 @@ C = logic.PropSymbolExpr('C');
 D = logic.PropSymbolExpr('D');
 symbols = [A, B, C, D]
 
-exactly1 = logicPlan.exactlyOne(symbols)
+exactly1 = logicPlan.exactly_one(symbols)
 
 model1 = {A:False, B:False, C:False, D:False}
 model2 = {A:False, B:True, C:False, D:False}

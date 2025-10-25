@@ -12,7 +12,7 @@ C = logic.PropSymbolExpr('C');
 D = logic.PropSymbolExpr('D');
 symbols = [A, B, C, D]
 
-atleast1 = logicPlan.atLeastOne(symbols)
+atleast1 = logicPlan.at_least_one(symbols)
 model1 = {A:False, B:False, C:False, D:False}
 model2 = {A:False, B:True, C:False, D:False}
 model3 = {A:True, B:True, C:False, D:False}

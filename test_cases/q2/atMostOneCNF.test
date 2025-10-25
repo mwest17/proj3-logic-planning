@@ -10,7 +10,7 @@ A = logic.Expr('A')
 B = logic.Expr('B')
 C = logic.Expr('C')
 D = logic.Expr('D')
-expr = logicPlan.atMostOne([A, B, C, D])
+expr = logicPlan.at_most_one([A, B, C, D])
 """
 
 # A python expression to be evaluated.  This expression must return the 

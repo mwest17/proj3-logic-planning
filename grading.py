@@ -133,10 +133,6 @@ class Grades:
                     @@@@@@@@@@@@@@@@@@
 
 """)
-        print("""
-Your grades are NOT yet registered.  To register your grades, make sure
-to follow your instructor's guidelines to receive credit on your project.
-""")
 
         if self.edxOutput:
             self.produceOutput()

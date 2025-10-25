@@ -27,6 +27,7 @@ from typing import Tuple
 import agents
 from logic_utils import *
 import pycosat
+import util
 
 util.VALIDATION_LISTS['search'] = [
         "\\xa0anys",

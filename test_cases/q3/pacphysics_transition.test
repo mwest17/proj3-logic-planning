@@ -4,9 +4,9 @@ failure: "NO PASS"
 
 # Python statements initializing variables for the test below.
 preamble: """
-from logicPlan import pacmanSuccessorAxiomSingle
+from logicPlan import pacman_successor_axiom_single
 
-psas = pacmanSuccessorAxiomSingle
+psas = pacman_successor_axiom_single
 
 grid1 = [[0]*3]*3 # no walls; note that the three lists are the same reference
 grid2 = [[1]*4, [1, 0, 0, 1], [1, 0, 1, 1], [1]*4] # 2x2 inside

@@ -5,7 +5,7 @@ failure: "NO PASS"
 # Python statements initializing variables for the test below.
 preamble: """
 import logic
-from logicPlan import plTrueInverse, findModel, sentence1, sentence3, modelToString
+from logicPlan import pl_true_inverse, find_model, sentence1, sentence3, model_to_string
 
 A = logic.PropSymbolExpr('A')
 B = logic.PropSymbolExpr('B')
@@ -14,13 +14,13 @@ results = {}
 ans = None
 
 for expr in [A, A >> B, sentence1()]:
-  model = findModel(expr)
-  results[~expr] = plTrueInverse(model, ~expr), model
-  results[expr] = plTrueInverse(model, expr), model
+  model = find_model(expr)
+  results[~expr] = pl_true_inverse(model, ~expr), model
+  results[expr] = pl_true_inverse(model, expr), model
 
 ans = ''
 for key, value in results.items():
-  ans += modelToString(value[1]) + ' does not satisfy ' + repr(key) + ' : ' + str(value[0]) + '. '
+  ans += model_to_string(value[1]) + ' does not satisfy ' + repr(key) + ' : ' + str(value[0]) + '. '
 """
 
 # A python expression to be evaluated.  This expression must return the 

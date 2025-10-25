@@ -5,5 +5,5 @@ failure: "NO PASS"
 # A python expression to be evaluated.  This expression must return the 
 # same result for the student and instructor's code.
 
-test: "logicPlan.modelToString(logicPlan.findModel(logicPlan.sentence3()))"
+test: "logicPlan.model_to_string(logicPlan.find_model(logicPlan.sentence3()))"
 

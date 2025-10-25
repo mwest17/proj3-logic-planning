@@ -224,7 +224,7 @@ def pacman_successor_axiom_single(x: int, y: int, time: int, walls_grid: List[Li
 
 def slam_successor_axiom_single(x: int, y: int, time: int, walls_grid: List[List[bool]]) -> Expr:
     """
-    Similar to `pacmanSuccessorStateAxioms` but accounts for illegal actions
+    Similar to `pacman_successor_state_axioms` but accounts for illegal actions
     where the pacman might not move timestep to timestep.
     Available actions are ['North', 'East', 'South', 'West']
     """
