@@ -65,7 +65,12 @@ def sentence1() -> Expr:
     (not A) or (not B) or C
     """
     "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    sen_1 = Expr('A') | Expr('B')
+    sen_2 = (~(Expr('A'))) % (~(Expr('B'))| Expr('C'))
+    sen_3 = disjoin([(~(Expr('A'))),(~(Expr('B'))),(Expr('C'))])
+    return conjoin([sen_1,sen_2,sen_3])
+    
+
     "*** END YOUR CODE HERE ***"
 
 
@@ -78,7 +83,12 @@ def sentence2() -> Expr:
     (not D) implies C
     """
     "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    sen_1 = Expr('C') % (Expr('B')|Expr('D'))
+    sen_2 = Expr('A') >> (~(Expr('B')) & ~(Expr('D')))
+    sen_3 = ~(Expr('B')& (~Expr('C'))) >> Expr('A')
+    sen_4 = ~(Expr('D')) >> Expr('C')
+    return conjoin([sen_1,sen_2,sen_3,sen_4])
+
     "*** END YOUR CODE HERE ***"
 
 
@@ -96,7 +106,17 @@ def sentence3() -> Expr:
     (Project update: for this question only, [0] and _t are both acceptable.)
     """
     "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    PA_0 = PropSymbolExpr("PacmanAlive", time=0)
+    PA_1 = PropSymbolExpr("PacmanAlive", time=1)
+    PB_0 = PropSymbolExpr("PacmanBorn", time=0)
+    PK_0 = PropSymbolExpr("PacmanKilled", time=0)
+
+    s1 = PA_1 % ((PA_0 & ~PK_0) | (~PA_0 & PB_0))
+    s2 = ~(PA_0 & PB_0)
+    s3 = PB_0
+
+    return conjoin([s1, s2, s3])
+
     "*** END YOUR CODE HERE ***"
 
 def find_model(sentence: Expr) -> Dict[Expr, bool]:
@@ -121,14 +141,24 @@ def find_model_check() -> Dict[Any, bool]:
         def __repr__(self):
             return self.variable_name
     "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return {dummyClass('a'):True}
     "*** END YOUR CODE HERE ***"
 
 def entails(premise: Expr, conclusion: Expr) -> bool:
     """Returns True if the premise entails the conclusion and False otherwise.
     """
     "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    """
+    The condition stated below is inconsistent (cannot be satisfied) 
+    if both the premise and conclusion are true.
+    By definition of entailment: 
+    In all posible models where the Knowledge Base(premise) is true
+    f (conclusion) is true
+    """
+    Unsatisfiable_condition = premise & ~(conclusion)
+    found = find_model(Unsatisfiable_condition)
+    "if we dont find such model, find_model returns False and we can say the premise entails the conclusion"
+    return found == False
     "*** END YOUR CODE HERE ***"
 
 def pl_true_inverse(assignments: Dict[Expr, bool], inverse_statement: Expr) -> bool:
@@ -136,7 +166,8 @@ def pl_true_inverse(assignments: Dict[Expr, bool], inverse_statement: Expr) -> b
     pl_true may be useful here; see logic.py for its description.
     """
     "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    inv_sentence = ~inverse_statement
+    return pl_true(inv_sentence, assignments)
     "*** END YOUR CODE HERE ***"
 
 #______________________________________________________________________________
