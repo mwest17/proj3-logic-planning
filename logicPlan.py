@@ -93,9 +93,25 @@ def sentence3() -> Expr:
     Pacman is born at time 0.
     (Project update: for this question only, [0] and _t are both acceptable.)
     """
-    "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
-    "*** END YOUR CODE HERE ***"
+    # x, y = 10, 5
+    # t = 3
+    # PropSymbolExpr(pacman_str, x, y, time=t)
+    # PropSymbolExpr(str, a1, a2, a3, a4, time=a5) creates str[a1,a2,a3,a4]_a5 
+    # (where str is a string)
+
+    PacmanAlive = "PacmanAlive"
+    Alive_0 = PropSymbolExpr(PacmanAlive, time=0)
+    Alive_1 = PropSymbolExpr(PacmanAlive, time=1)
+    PacmanBorn = "PacmanBorn"
+    Born_0 = PropSymbolExpr(PacmanBorn, time=0)
+    PacmanKilled = "PacmanKilled"
+    Killed_0 = PropSymbolExpr(PacmanKilled, time=0)
+
+    S1 = Alive_1 % ((Alive_0 & ~Killed_0) | (~Alive_0 & Born_0))
+    S2 = ~(Alive_0 & Born_0)
+    S3 = Born_0
+
+    return conjoin(S1, S2, S3)
 
 def find_model(sentence: Expr) -> Dict[Expr, bool]:
     """Given a propositional logic sentence (i.e. a Expr instance), returns a satisfying
