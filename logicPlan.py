@@ -193,7 +193,7 @@ def at_least_one(literals: List[Expr]) -> Expr:
     True
     """
     "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return disjoin(literals)
     "*** END YOUR CODE HERE ***"
 
 
@@ -205,7 +205,19 @@ def at_most_one(literals: List[Expr]) -> Expr:
     itertools.combinations may be useful here.
     """
     "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    """
+    create a list to store all pairs of literals where ~(lit1 AND lit2)
+
+    Applying De Morgans law = ~lit1 OR ~lit2 
+    which is a valid clause for CNF
+    """
+    pairs = []
+    "generate all the pairs of literals where ~lit1 OR ~lit2"
+    for lit1,lit2 in itertools.combinations(literals,2):
+        pairs.append(~lit1 | ~lit2)
+
+    "if one of the pairs outputs FALSE it means there is more than one expression true"
+    return conjoin(pairs)
     "*** END YOUR CODE HERE ***"
 
 
@@ -216,7 +228,11 @@ def exactly_one(literals: List[Expr]) -> Expr:
     the expressions in the list is true.
     """
     "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    "both at least one and at most one need to be True for it to be exactly one"
+    at_least = at_least_one(literals)
+    at_most = at_most_one(literals)
+    return conjoin(at_least,at_most)
+
     "*** END YOUR CODE HERE ***"
 
 #______________________________________________________________________________
