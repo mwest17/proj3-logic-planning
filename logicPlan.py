@@ -93,12 +93,6 @@ def sentence3() -> Expr:
     Pacman is born at time 0.
     (Project update: for this question only, [0] and _t are both acceptable.)
     """
-    # x, y = 10, 5
-    # t = 3
-    # PropSymbolExpr(pacman_str, x, y, time=t)
-    # PropSymbolExpr(str, a1, a2, a3, a4, time=a5) creates str[a1,a2,a3,a4]_a5 
-    # (where str is a string)
-
     PacmanAlive = "PacmanAlive"
     Alive_0 = PropSymbolExpr(PacmanAlive, time=0)
     Alive_1 = PropSymbolExpr(PacmanAlive, time=1)
@@ -134,24 +128,21 @@ def find_model_check() -> Dict[Any, bool]:
         
         def __repr__(self):
             return self.variable_name
-    "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
-    "*** END YOUR CODE HERE ***"
+    return {dummyClass('a'):True}
 
 def entails(premise: Expr, conclusion: Expr) -> bool:
     """Returns True if the premise entails the conclusion and False otherwise.
     """
-    "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
-    "*** END YOUR CODE HERE ***"
+    # If something entails from something else, 
+    # then that means the model that means the model of the conclusion is a subset of the premises
+    # The inverse must be unsatisfiable 
+    return find_model(premise & ~conclusion) == False 
 
 def pl_true_inverse(assignments: Dict[Expr, bool], inverse_statement: Expr) -> bool:
     """Returns True if the (not inverse_statement) is True given assignments and False otherwise.
     pl_true may be useful here; see logic.py for its description.
     """
-    "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
-    "*** END YOUR CODE HERE ***"
+    return pl_true(~inverse_statement, model=assignments)
 
 #______________________________________________________________________________
 # QUESTION 2
