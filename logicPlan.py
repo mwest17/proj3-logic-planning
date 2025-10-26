@@ -64,9 +64,8 @@ def sentence1() -> Expr:
     (not A) if and only if ((not B) or C)
     (not A) or (not B) or C
     """
-    "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
-    "*** END YOUR CODE HERE ***"
+    A, B, C = Expr('A'), Expr('B'), Expr('C')
+    return conjoin(A | B, (~A) % (~B | C), disjoin(~A, ~B, C))
 
 
 def sentence2() -> Expr:
@@ -77,9 +76,8 @@ def sentence2() -> Expr:
     (not (B and (not C))) implies A
     (not D) implies C
     """
-    "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
-    "*** END YOUR CODE HERE ***"
+    A, B, C, D = Expr('A'), Expr('B'), Expr('C'), Expr('D')
+    return conjoin(C % (B | D), A >> (~B & ~D), (~(B & ~C)) >> A, ~D >> C)
 
 
 def sentence3() -> Expr:
