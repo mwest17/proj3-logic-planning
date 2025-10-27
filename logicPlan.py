@@ -452,6 +452,11 @@ def position_logic_plan(problem) -> List:
 #______________________________________________________________________________
 # QUESTION 5
 
+def food_successor_axiom(x, y, time) -> Expr:
+    # Food[x,y]_t+1 <==> ~Pacman[x,y]_t & Food[x,y]_t
+    now, last = time, time - 1
+    return PropSymbolExpr(food_str, x, y, time=now) % (~PropSymbolExpr(pacman_str, x, y, time=last) & PropSymbolExpr(food_str, x, y, time=last))
+
 def food_logic_plan(problem) -> List:
     """
     Given an instance of a FoodPlanningProblem, return a list of actions that help Pacman
@@ -474,9 +479,30 @@ def food_logic_plan(problem) -> List:
 
     KB = []
 
-    "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
-    "*** END YOUR CODE HERE ***"
+    # Add pacmans location at t=0
+    KB.append(PropSymbolExpr(pacman_str, x0, y0, time=0))
+    # Initialize food positions
+    KB += [PropSymbolExpr(food_str, x, y, time=0) for x,y in food]
+
+    for t in range(50):
+        print(t)
+
+        # Add condition where pacman must be at exactly one location
+        KB.append(exactly_one([PropSymbolExpr(pacman_str, x, y, time=t) for x, y in non_wall_coords]))
+        global_assertion = conjoin([~PropSymbolExpr(food_str, x, y, time=t) for x,y in food])
+        model = find_model(conjoin(KB) & global_assertion)
+        
+        if model: # We've reached goal state
+            return extract_action_sequence(model, actions)
+        
+        # Add condition where pacman takes one action per timestep
+        KB.append(exactly_one([PropSymbolExpr(action, time=t) for action in actions]))
+        
+        # Add transition model for all non_wall_cords
+        for x,y in non_wall_coords:
+            KB.append(pacman_successor_axiom_single(x, y, t+1, walls_grid=walls))
+            KB.append(food_successor_axiom(x, y, t+1))
+    
 
 #______________________________________________________________________________
 # QUESTION 6
