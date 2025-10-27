@@ -351,7 +351,7 @@ def pacphysics_axioms(t: int, all_coords: List[Tuple], non_outer_wall_coords: Li
                                              PropSymbolExpr('East', time=t),  
                                              PropSymbolExpr('West', time=t)]))
 
-    if sensor_model != None:
+    if sensor_model:
         # Should not append if caller is check_location_satisfiability
         pacphysics_sentences.append(sensor_model(t, non_outer_wall_coords)) 
 
@@ -428,9 +428,6 @@ def position_logic_plan(problem) -> List:
     actions = [ 'North', 'South', 'East', 'West' ]
     KB = []
 
-    "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
-    "*** END YOUR CODE HERE ***"
 
 #______________________________________________________________________________
 # QUESTION 5
