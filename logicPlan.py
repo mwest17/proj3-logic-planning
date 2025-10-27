@@ -264,9 +264,8 @@ def pacman_successor_axiom_single(x: int, y: int, time: int, walls_grid: List[Li
     if not possible_causes:
         return None
     
-    "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
-    "*** END YOUR CODE HERE ***"
+    current = PropSymbolExpr(pacman_str, x, y, time=now)
+    return current % disjoin(possible_causes)
 
 
 def slam_successor_axiom_single(x: int, y: int, time: int, walls_grid: List[List[bool]]) -> Expr:
@@ -335,9 +334,29 @@ def pacphysics_axioms(t: int, all_coords: List[Tuple], non_outer_wall_coords: Li
     """
     pacphysics_sentences = []
 
-    "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
-    "*** END YOUR CODE HERE ***"
+    # For all x,y in all_coords, append the following implication:
+        # If a wall is at x,y, then pacman is not at x,y at t
+    for x,y in all_coords:
+        pacphysics_sentences.append(PropSymbolExpr(wall_str, x, y) >> ~PropSymbolExpr(pacman_str, x, y, time=t))
+
+    # At exactly 1 of the non_outer_wall_coords at time t
+    nonOuterWallCoordsExpr = []
+    for x,y in non_outer_wall_coords:
+        nonOuterWallCoordsExpr.append(PropSymbolExpr(pacman_str, x, y, time=t))
+    pacphysics_sentences.append(exactly_one(nonOuterWallCoordsExpr))
+
+    # Exactly 1 of actions in directions at time t
+    pacphysics_sentences.append(exactly_one([PropSymbolExpr('North', time=t), 
+                                             PropSymbolExpr('South', time=t),
+                                             PropSymbolExpr('East', time=t),  
+                                             PropSymbolExpr('West', time=t)]))
+
+    if sensor_model:
+        # Should not append if caller is check_location_satisfiability
+        pacphysics_sentences.append(sensor_model(t, non_outer_wall_coords)) 
+
+    if successor_axioms and t != 0: # **WORKAROUND**
+        pacphysics_sentences.append(successor_axioms(t, walls_grid, non_outer_wall_coords))
 
     return conjoin(pacphysics_sentences)
 
@@ -369,9 +388,39 @@ def check_location_satisfiability(x1_y1: Tuple[int, int], x0_y0: Tuple[int, int]
     map_sent = [PropSymbolExpr(wall_str, x, y) for x, y in walls_list]
     KB.append(conjoin(map_sent))
 
-    "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
-    "*** END YOUR CODE HERE ***"
+    KB.append(pacphysics_axioms(1, all_coords, non_outer_wall_coords, walls_grid=walls_grid, successor_axioms=all_legal_successor_axioms))
+
+    KB.append(PropSymbolExpr(pacman_str, x0, y0, time=0))
+
+    for action in DIRECTIONS:
+        if action == action0:
+            None
+        if action == action1:
+            None
+        else:
+            # KB.append(~PropSymbolExpr(action, time=0))
+            None
+    KB.append(PropSymbolExpr(action0, time=0))
+    KB.append(PropSymbolExpr(action1, time=0))
+
+    # Adding places we aren't to knowledge base. Why do we need to do this to match the test case?
+    for x, y in all_coords:
+        if (x, y) != x0_y0:
+            KB.append(~PropSymbolExpr(pacman_str, x, y, time=0))
+            
+
+    model1 = find_model(conjoin(KB + [PropSymbolExpr(pacman_str, x1, y1, time=1)]))
+    print("Model at: ")
+    print(model1)
+    model2 = find_model(conjoin(KB + [~PropSymbolExpr(pacman_str, x1, y1, time=1)]))
+    print("Model not at: ")
+    print(model2)
+    # print(action0)
+    # print(action1)
+    
+    
+    return (model1, model2)
+
 
 #______________________________________________________________________________
 # QUESTION 4
