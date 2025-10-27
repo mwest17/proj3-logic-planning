@@ -534,10 +534,41 @@ def findPossiblePacLocations(t, KB, non_outer_wall_coords) -> List:
             KB.append(~pacAtPos)
     return possible_locations
 
-def findProvableWalls(non_outer_wall_coords):
+def findProvableWalls(t, KB, known_map, non_outer_wall_coords):
+    # provableWalls = []
     for x, y in non_outer_wall_coords:
-        None
-    return
+        wallAtPos = PropSymbolExpr(pacman_str, x, y)
+        entailsWall = entails(conjoin(KB), wallAtPos)
+        entailsNotWall = entails(conjoin(KB), ~wallAtPos)
+        # If pacman's ever been there, that entails no wall
+        # entailsNotWall = entails(conjoin(KB), disjoin([PropSymbolExpr(pacman_str, x, y, ti) for ti in range(0, t+1)])) # Not proving that there is no wall there. Why
+
+        # if entailsWall == entailsNotWall:
+            # print("Error should not happen:")
+            # print((x,y))
+            # print("Entails Position: " + str(entailsWall) + " Doesn't Entail Position: " + str(entailsNotWall))
+
+        # if (x,y) == (2, 3):
+            # print((x,y))
+            # print("Entails Position: " + str(entailsWall) + " Doesn't Entail Position: " + str(entailsNotWall))
+        # if (x,y) == (2, 3):
+            # print((x,y))
+            # print("Entails Position: " + str(entailsWall) + " Doesn't Entail Position: " + str(entailsNotWall))
+
+
+        # This function will not get a true entailsNoWall for some reason. I don't know why
+        if entailsWall:# or (entailsWall == entailsNotWall == False):
+            known_map[x][y] = 1
+            KB.append(wallAtPos)
+        elif entailsNotWall:
+            known_map[x][y] = 0
+            KB.append(~wallAtPos)
+
+    for row in known_map:
+        print(row)
+        # 2, 3
+        # 2, 4
+    return (KB, known_map)
 
 
 def localization(problem, agent) -> Generator:
@@ -592,11 +623,18 @@ def mapping(problem, agent) -> Generator:
             outer_wall_sent.append(PropSymbolExpr(wall_str, x, y))
     KB.append(conjoin(outer_wall_sent))
 
-    "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    KB.append(PropSymbolExpr(pacman_str, pac_x_0, pac_y_0) 
+              & ~PropSymbolExpr(wall_str, pac_x_0, pac_y_0))
+    known_map[pac_x_0][pac_y_0] = 0
+
+    print("Starting position " + str((pac_x_0, pac_y_0)))
 
     for t in range(agent.num_timesteps):
-        "*** END YOUR CODE HERE ***"
+        KB.append(addBaseInfoToKB(t, all_coords, non_outer_wall_coords, known_map, 
+                        sensor_axioms, all_legal_successor_axioms, four_bit_percept_rules, agent)) 
+        KB, known_map = findProvableWalls(t, KB, known_map, non_outer_wall_coords)
+
+        agent.move_to_next_state(agent.actions[t])
         yield known_map
 
 #______________________________________________________________________________
