@@ -427,7 +427,17 @@ def position_logic_plan(problem) -> List:
     non_wall_coords = [loc for loc in all_coords if loc not in walls_list]
     actions = [ 'North', 'South', 'East', 'West' ]
     KB = []
+    KB.append(PropSymbolExpr(pacman_str, x0, y0, time=0))
 
+    for t in range(50):
+        print(t)
+        KB.append(exactly_one([PropSymbolExpr(pacman_str, x, y, time=t) for x, y in non_wall_coords]))
+        model = find_model(conjoin(KB + [PropSymbolExpr(pacman_str, xg, yg, time=t)])) #And the global assertion?????
+        print(model)
+        if model:
+            return extract_action_sequence(model, [])
+        KB.append(exactly_one([PropSymbolExpr(action, t) for action in actions]))
+        KB.append(pacman_successor_axiom_single(x, y, time = t, walls_grid=walls_grid))
 
 #______________________________________________________________________________
 # QUESTION 5
