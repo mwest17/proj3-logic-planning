@@ -427,17 +427,26 @@ def position_logic_plan(problem) -> List:
     non_wall_coords = [loc for loc in all_coords if loc not in walls_list]
     actions = [ 'North', 'South', 'East', 'West' ]
     KB = []
+
+    # Add pacmans location at t=0
     KB.append(PropSymbolExpr(pacman_str, x0, y0, time=0))
 
     for t in range(50):
         print(t)
+        # Add condition where pacman must be at exactly one location
         KB.append(exactly_one([PropSymbolExpr(pacman_str, x, y, time=t) for x, y in non_wall_coords]))
-        model = find_model(conjoin(KB + [PropSymbolExpr(pacman_str, xg, yg, time=t)])) #And the global assertion?????
-        print(model)
+        global_assertion = PropSymbolExpr(pacman_str, xg, yg, time=t)
+        model = find_model(conjoin(KB) & global_assertion)
+        
         if model:
-            return extract_action_sequence(model, [])
-        KB.append(exactly_one([PropSymbolExpr(action, t) for action in actions]))
-        KB.append(pacman_successor_axiom_single(x, y, time = t, walls_grid=walls_grid))
+    
+            return extract_action_sequence(model, actions)
+        # Add condition where pacman takes one action per timestep
+        KB.append(exactly_one([PropSymbolExpr(action, time=t) for action in actions]))
+        # Add transition model for all non_wall_cords
+        for x,y in non_wall_coords:
+            KB.append(pacman_successor_axiom_single(x, y, t+1, walls_grid))
+    
 
 #______________________________________________________________________________
 # QUESTION 5
