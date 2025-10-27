@@ -438,11 +438,12 @@ def position_logic_plan(problem) -> List:
         global_assertion = PropSymbolExpr(pacman_str, xg, yg, time=t)
         model = find_model(conjoin(KB) & global_assertion)
         
-        if model:
-    
+        if model: # We've reached goal state
             return extract_action_sequence(model, actions)
+        
         # Add condition where pacman takes one action per timestep
         KB.append(exactly_one([PropSymbolExpr(action, time=t) for action in actions]))
+        
         # Add transition model for all non_wall_cords
         for x,y in non_wall_coords:
             KB.append(pacman_successor_axiom_single(x, y, t+1, walls_grid))
