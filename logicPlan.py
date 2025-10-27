@@ -507,6 +507,39 @@ def food_logic_plan(problem) -> List:
 #______________________________________________________________________________
 # QUESTION 6
 
+# Helper Functions:
+def addBaseInfoToKB(t, all_coords, non_outer_wall_coords, walls_grid, sensor_axiom, successor_axoim, percept_rules, agent) -> Expr:
+    pacphysics = pacphysics_axioms(t, all_coords, non_outer_wall_coords, walls_grid, sensor_model=sensor_axiom, successor_axioms=successor_axoim)
+    action = PropSymbolExpr(agent.actions[t], time=t)
+    percepts = percept_rules(t, agent.get_percepts())
+    
+    return conjoin([pacphysics, action, percepts])
+
+def findPossiblePacLocations(t, KB, non_outer_wall_coords) -> List:
+    possible_locations = []
+    for x,y in non_outer_wall_coords:
+        pacAtPos = PropSymbolExpr(pacman_str, x, y, time=t)
+        entailsPos = entails(conjoin(KB), pacAtPos) # Entails A
+        entailsNotPos = entails(conjoin(KB), ~pacAtPos) # Entails not A
+        
+        # if entailsPos == entailsNotPos:
+        #     print("Error should not happen:")
+        #     print((x,y))
+        #     print("Entails Position: " + str(entailsPos) + " Doesn't Entail Position: " + str(entailsNotPos))
+
+        if entailsPos or (entailsPos == entailsNotPos == False):
+            possible_locations.append((x, y))
+            # KB.append(pacAtPos)
+        elif entailsNotPos:
+            KB.append(~pacAtPos)
+    return possible_locations
+
+def findProvableWalls(non_outer_wall_coords):
+    for x, y in non_outer_wall_coords:
+        None
+    return
+
+
 def localization(problem, agent) -> Generator:
     '''
     problem: a LocalizationProblem instance
@@ -519,11 +552,19 @@ def localization(problem, agent) -> Generator:
 
     KB = []
 
-    "*** BEGIN YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    for x,y in all_coords:
+        if (x,y) in walls_list:
+            KB.append(PropSymbolExpr(wall_str, x, y))
+        else:
+            KB.append(~PropSymbolExpr(wall_str, x, y))
 
     for t in range(agent.num_timesteps):
-        "*** END YOUR CODE HERE ***"
+        KB.append(addBaseInfoToKB(t, all_coords, non_outer_wall_coords, walls_grid, 
+                        sensor_axioms, all_legal_successor_axioms, four_bit_percept_rules, agent))
+
+        agent.move_to_next_state(agent.actions[t])
+
+        possible_locations = findPossiblePacLocations(t, KB, non_outer_wall_coords)
         yield possible_locations
 
 #______________________________________________________________________________
