@@ -355,7 +355,7 @@ def pacphysics_axioms(t: int, all_coords: List[Tuple], non_outer_wall_coords: Li
         # Should not append if caller is check_location_satisfiability
         pacphysics_sentences.append(sensor_model(t, non_outer_wall_coords)) 
 
-    if successor_axioms and t != 0: # **WORKAROUND**
+    if successor_axioms and t != 0:
         pacphysics_sentences.append(successor_axioms(t, walls_grid, non_outer_wall_coords))
 
     return conjoin(pacphysics_sentences)
@@ -388,26 +388,16 @@ def check_location_satisfiability(x1_y1: Tuple[int, int], x0_y0: Tuple[int, int]
     map_sent = [PropSymbolExpr(wall_str, x, y) for x, y in walls_list]
     KB.append(conjoin(map_sent))
     
-    # Know what valid positions are for t=1
-    physicsAxioms = pacphysics_axioms(1, all_coords, non_outer_wall_coords, walls_grid=walls_grid, successor_axioms=all_legal_successor_axioms)
-    KB.append(physicsAxioms)
+    # Know what valid positions are for t=1 and t=0
+    KB.append(pacphysics_axioms(1, all_coords, non_outer_wall_coords, walls_grid=walls_grid, successor_axioms=all_legal_successor_axioms))
+    KB.append(pacphysics_axioms(0, all_coords, non_outer_wall_coords, walls_grid=walls_grid))
     
+    # Add starting position
+    KB.append(PropSymbolExpr(pacman_str, x0, y0, time=0))
+
     # Add add action taken from starting and t=1 position action
     KB.append(PropSymbolExpr(action0, time=0))
     KB.append(PropSymbolExpr(action1, time=1))
-
-    # Can only move in one direction
-    KB.append(exactly_one([PropSymbolExpr('North', time=0), 
-                           PropSymbolExpr('South', time=0),
-                           PropSymbolExpr('East', time=0),  
-                           PropSymbolExpr('West', time=0)]))
-
-    # Add starting position
-    KB.append(PropSymbolExpr(pacman_str, x0, y0, time=0))
-    # Adding places we aren't to knowledge base. We want to ensure that our model says we AREN'T any other location too
-    for x, y in all_coords:
-        if (x, y) != x0_y0:
-            KB.append(~PropSymbolExpr(pacman_str, x, y, time=0))
 
     model1 = find_model(conjoin(KB + [PropSymbolExpr(pacman_str, x1, y1, time=1)]))
     model2 = find_model(conjoin(KB + [~PropSymbolExpr(pacman_str, x1, y1, time=1)]))
