@@ -384,37 +384,42 @@ def check_location_satisfiability(x1_y1: Tuple[int, int], x0_y0: Tuple[int, int]
     x0, y0 = x0_y0
     x1, y1 = x1_y1
 
+    # print("x0, y0: " + str(x0_y0))
+    # print("x1, y1: " + str(x1_y1))
+
     # We know which coords are walls:
     map_sent = [PropSymbolExpr(wall_str, x, y) for x, y in walls_list]
     KB.append(conjoin(map_sent))
+    
+    physicsAxioms = pacphysics_axioms(1, all_coords, non_outer_wall_coords, walls_grid=walls_grid, successor_axioms=all_legal_successor_axioms)
+    # print(physicsAxioms)
+    # print(model_to_string(find_model(physicsAxioms)))
+    KB.append(physicsAxioms)
+    
+    KB.append(PropSymbolExpr(action0, time=0))
+    KB.append(PropSymbolExpr(action1, time=1))
 
-    KB.append(pacphysics_axioms(1, all_coords, non_outer_wall_coords, walls_grid=walls_grid, successor_axioms=all_legal_successor_axioms))
+    # Can only move in one direction
+    KB.append(exactly_one([PropSymbolExpr('North', time=0), 
+                           PropSymbolExpr('South', time=0),
+                           PropSymbolExpr('East', time=0),  
+                           PropSymbolExpr('West', time=0)]))
 
     KB.append(PropSymbolExpr(pacman_str, x0, y0, time=0))
-
-    for action in DIRECTIONS:
-        if action == action0:
-            None
-        if action == action1:
-            None
-        else:
-            # KB.append(~PropSymbolExpr(action, time=0))
-            None
-    KB.append(PropSymbolExpr(action0, time=0))
-    KB.append(PropSymbolExpr(action1, time=0))
-
-    # Adding places we aren't to knowledge base. Why do we need to do this to match the test case?
+    # Adding places we aren't to knowledge base. We want to ensure that our model says we AREN'T any other location too
+    # Maybe switch to an exactly one functioin call?
     for x, y in all_coords:
         if (x, y) != x0_y0:
             KB.append(~PropSymbolExpr(pacman_str, x, y, time=0))
             
+    # print(KB)
 
     model1 = find_model(conjoin(KB + [PropSymbolExpr(pacman_str, x1, y1, time=1)]))
-    print("Model at: ")
-    print(model1)
+    # print("Model at: ")
+    # print(model_to_string(model1))
     model2 = find_model(conjoin(KB + [~PropSymbolExpr(pacman_str, x1, y1, time=1)]))
-    print("Model not at: ")
-    print(model2)
+    # print("Model not at: ")
+    # print(model_to_string(model2))
     # print(action0)
     # print(action1)
     
