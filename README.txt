@@ -19,9 +19,21 @@ Q3 was straightforward until we encountered a problematic edge case: t=0. We can
 because it will try to reference time =-1, which doesnt make sense. We handled it in check_location_satifiablity()
 by appending to KB what we knew its valid without calling the successor axiom. Additionally, we implemented a condtional of t!=0 before appending succesors.
 
-Q4- Q7
+Q4 was also pretty straightforward. We first implemented the pseudocode, which got us most of the way there. 
+The main issue was determining the proper way to implement the transition model.
+
+Q5 followed a similar structure to Q4. The majority of our work for that was in implementing the goal state and the food 
+succesor axiom (and how the pacman successor axiom still played a part).
+
+Q6 was a challenge, as the helper functions were not entirely clear at first. Implementing the logic in the actual Q6 function with placeholder helper functions
+made it easier to then determine what the helper functions needed to do.
+
+Q7 was even more of a challenge. We went through a few iterations of findProvableWalls. 
+Our main issue came from misunderstanding what logic the sensors added to the model. 
+Once we were checking the entailment of the correct blocking statements, the function worked as intended.
+
 
 AI Use:
-Matthew - 
+Matthew - I used AI for python syntax.
 
 Miguel Mateo - I used AI as a suplemental resource to brainstorm
