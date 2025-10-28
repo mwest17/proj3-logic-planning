@@ -521,53 +521,47 @@ def findPossiblePacLocations(t, KB, non_outer_wall_coords) -> List:
         pacAtPos = PropSymbolExpr(pacman_str, x, y, time=t)
         entailsPos = entails(conjoin(KB), pacAtPos) # Entails A
         entailsNotPos = entails(conjoin(KB), ~pacAtPos) # Entails not A
-        
-        # if entailsPos == entailsNotPos:
-        #     print("Error should not happen:")
-        #     print((x,y))
-        #     print("Entails Position: " + str(entailsPos) + " Doesn't Entail Position: " + str(entailsNotPos))
 
         if entailsPos or (entailsPos == entailsNotPos == False):
             possible_locations.append((x, y))
-            # KB.append(pacAtPos)
         elif entailsNotPos:
             KB.append(~pacAtPos)
     return possible_locations
 
 def findProvableWalls(t, KB, known_map, non_outer_wall_coords):
-    # provableWalls = []
-    for x, y in non_outer_wall_coords:
-        wallAtPos = PropSymbolExpr(pacman_str, x, y)
-        entailsWall = entails(conjoin(KB), wallAtPos)
-        entailsNotWall = entails(conjoin(KB), ~wallAtPos)
-        # If pacman's ever been there, that entails no wall
-        # entailsNotWall = entails(conjoin(KB), disjoin([PropSymbolExpr(pacman_str, x, y, ti) for ti in range(0, t+1)])) # Not proving that there is no wall there. Why
+    pacx, pacy = 0, 0
+    # Find our current position so we know what coordinate we are facing in each direction
+    for x,y in non_outer_wall_coords:
+        if entails(conjoin(KB), PropSymbolExpr(pacman_str, x, y, time=t)):
+            pacx, pacy = x, y
 
-        # if entailsWall == entailsNotWall:
-            # print("Error should not happen:")
-            # print((x,y))
-            # print("Entails Position: " + str(entailsWall) + " Doesn't Entail Position: " + str(entailsNotWall))
+    for d in DIRECTIONS:
+        # This statement says if any of the walls surrounding pacman are blocking him
+        blocked = PropSymbolExpr(blocked_str_map[d], time=t)
+        # Find if for each direction if blocked or not
+        entailsWall = entails(conjoin(KB), blocked)
+        entailsNotWall = entails(conjoin(KB), ~blocked)
 
-        # if (x,y) == (2, 3):
-            # print((x,y))
-            # print("Entails Position: " + str(entailsWall) + " Doesn't Entail Position: " + str(entailsNotWall))
-        # if (x,y) == (2, 3):
-            # print((x,y))
-            # print("Entails Position: " + str(entailsWall) + " Doesn't Entail Position: " + str(entailsNotWall))
+        # Based on current position, so need to find coordinate offset based on direction
+        offsetx, offsety = 0, 0
+        if d == 'North':
+            offsetx, offsety = 0, 1
+        elif d == 'East':
+            offsetx, offsety = 1, 0
+        elif d == 'South':
+            offsetx, offsety = 0, -1
+        elif d == 'West':
+            offsetx, offsety = -1, 0
+        
+        # Add if coordinate is wall or not to model and map
+        wallStatement = PropSymbolExpr(wall_str, pacx + offsetx, pacy + offsety)
+        if entailsWall:
+            known_map[pacx + offsetx][pacy + offsety] = 1
+            KB.append(wallStatement)
+        elif entailsNotWall:    
+            known_map[pacx + offsetx][pacy + offsety] = 0
+            KB.append(~wallStatement)
 
-
-        # This function will not get a true entailsNoWall for some reason. I don't know why
-        if entailsWall:# or (entailsWall == entailsNotWall == False):
-            known_map[x][y] = 1
-            KB.append(wallAtPos)
-        elif entailsNotWall:
-            known_map[x][y] = 0
-            KB.append(~wallAtPos)
-
-    for row in known_map:
-        print(row)
-        # 2, 3
-        # 2, 4
     return (KB, known_map)
 
 
@@ -623,7 +617,7 @@ def mapping(problem, agent) -> Generator:
             outer_wall_sent.append(PropSymbolExpr(wall_str, x, y))
     KB.append(conjoin(outer_wall_sent))
 
-    KB.append(PropSymbolExpr(pacman_str, pac_x_0, pac_y_0) 
+    KB.append(PropSymbolExpr(pacman_str, pac_x_0, pac_y_0, time=0) 
               & ~PropSymbolExpr(wall_str, pac_x_0, pac_y_0))
     known_map[pac_x_0][pac_y_0] = 0
 
